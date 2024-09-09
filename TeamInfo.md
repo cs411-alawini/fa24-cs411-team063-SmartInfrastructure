@@ -4,25 +4,25 @@
 
 |   Info      |        Description     |
 | ----------- | ---------------------- |
-| TeamID      |        Team-000        |
-| TeamName    |         sample         |
-| Captain     |       Abdu Alawini     |
-| Captain     |  alawini@illinois.edu  |
-| Member1     |        Kevin Pei       |
-| Member1     |   kevin2@illinois.edu  |
-| Member2     |     Ti-Chung Cheng     |
-| Member2     |  tichung3@illinois.edu |
-| Member3     |                        |
-| Member3     |                        |
+| TeamID      |        Team-063        |
+| TeamName    |  SmartInfrastructure   |
+| Captain     |      Sam Dong      |
+| Captain     |  hongyid3@illinois.edu  |
+| Member1     |        Matthew Tzeng      |
+| Member1     |   mttzeng2@illinois.edu  |
+| Member2     |     Patrick Liu     |
+| Member2     |  pzl2@illinois.edu |
+| Member3     |     Sunny Chen                   |
+| Member3     |      sunnyc3@illinois.edu             |
 
 ## Project Information
 
 |   Info      |        Description     |
 | ----------- | ---------------------- |
-|  Title      |       ProjectTitle     |
+|  Title      |       SmartInfrastrucutre     |
 | System URL  |      link_to_system    |
 | Video Link  |      link_to_video     |
 
 ## Project Summary
 
-This is a summary of the project!
+WIP
