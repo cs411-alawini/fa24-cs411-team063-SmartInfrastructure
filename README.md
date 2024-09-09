@@ -1,1 +1,1 @@
-# fa24-cs411-team063-SmartInfrastructure
+# Team063-SmartInfrastrucutre
