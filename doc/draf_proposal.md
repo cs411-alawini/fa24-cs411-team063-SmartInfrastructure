@@ -3,15 +3,15 @@ THIS IS JUST A PLACE HOLDER
 
 ## 1. Project Title
 
-NBA Player Analyzer
+Guess the NBA Player Game
 
 ## 2. Description
 
-Our project is a sports-themed guessing game where players aim to identify a mystery basketball player by making educated guesses based on key performance stats. Instead of using physical attributes like height or team division, the game will focus on statistical categories such as points per game, average rebounds, assists, and shooting percentages. When players make a guess, the system will display a color gradient to indicate how close the guess is to the actual player’s stats—green representing closer matches, and red for guesses further away. Players use this feedback to narrow down their guesses, offering an engaging way to explore player performance metrics.
+Our project is a sports-themed guessing game where players aim to identify a mystery basketball player by making educated guesses based on key performance stats. Instead of using physical attributes like height or team division, the game will focus on statistical categories such as average points per game, average rebounds, assists, and shooting percentages. When players make a guess, the system will display a color gradient to indicate how close the guess is to the actual player’s stats—green representing closer matches, and red for guesses further away. Players use this feedback to narrow down their guesses, offering an engaging way to explore player performance metrics.
 
 ## 3. Creative Component
 
-Taking a pre-existing game and integrate it with the NBA player database. 
+Taking a pre-existing game (Wordle) and integrating it with the NBA player database.
 
 ## 4. Realness
 
@@ -20,7 +20,7 @@ Data will be sourced from:
 1. NBA Stats API
    - Format: JSON
    - Size: Comprehensive stats for all active players (500+) and historical players (4000+)
-   - Information: Game logs, advanced stats, shot chart data
+   - Information: Game logs, advanced stats, shot chart data, etc.
 
 2. Kaggle NBA Database
    https://www.kaggle.com/datasets/wyattowalsh/basketball
