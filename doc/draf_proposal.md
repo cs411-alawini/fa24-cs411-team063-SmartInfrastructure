@@ -50,6 +50,8 @@ The system should feature a user-friendly interface that allows players to easil
 
 ### Low-fidelity UI mockup
 
+![image](https://github.com/user-attachments/assets/9cc97cbe-e6ce-4bbb-b754-15f28d55750a)
+
 ### Project work distribution
 
 - Frontend Development (React): ?
