@@ -24,7 +24,7 @@ Taking a pre-existing game (Wordle) and integrating it with the NBA player datab
 1. Educational Value. It helps users learn about NBA players and their statistical performances in an engaging way.
 2. Entertainment. It provides a fun, daily challenge for basketball fans and trivia enthusiasts.
 3. Skill Development. Regular players can improve their knowledge of NBA statistics and player comparisons.
-4. Community Building: Leaderboards and shareable results foster a sense of community among users.
+4. Community Building. Leaderboards and shareable results create a sense of community among users.
 
 While there are other NBA trivia games, our application is unique because it focuses on statistical comparisons and its Wordle-inspired gameplay mechanic. Unlike simple multiple-choice quizzes, our game requires analytical thinking and provides a more in-depth exploration of player performances.
 
