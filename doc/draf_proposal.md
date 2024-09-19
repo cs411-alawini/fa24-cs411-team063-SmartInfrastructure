@@ -54,10 +54,9 @@ The system should feature a user-friendly interface that allows players to easil
 
 ### Project work distribution
 
-- Frontend Development (React): ?
-- Backend API and Game Logic (Python/Flask): ?
-- Database Management (SQL): ?
-- Data Processing and Integration: ?
-- UI/UX Design and Creative Components: ?
+- Frontend Development (React): Sunny Chen, Matthew Tzeng
+- UI/UX Design and Creative Components: Matthew Tzeng, Sunny Chen
+- Backend API and Game Logic (Python/React/JSON): Sam Dong, Patrick Liu
+- Database Management (SQL): Sam Dong, Matthew Tzeng, Patrick Liu, Sunny Chen
 
 Each team member will be responsible for both frontend and backend aspects of their assigned features. Regular meetings will ensure integration and cohesive development across all components.
