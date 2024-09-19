@@ -5,7 +5,7 @@
 |   Info      |        Description     |
 | ----------- | ---------------------- |
 | TeamID      |        Team-063        |
-| TeamName    |  SmartInfrastructure   |
+| TeamName    |    Role Players     |
 | Captain     |      Sam Dong      |
 | Captain     |  hongyid3@illinois.edu  |
 | Member1     |        Matthew Tzeng      |
@@ -19,7 +19,7 @@
 
 |   Info      |        Description     |
 | ----------- | ---------------------- |
-|  Title      |       SmartInfrastrucutre     |
+|  Title      |       Role Players     |
 | System URL  |      link_to_system    |
 | Video Link  |      link_to_video     |
 
