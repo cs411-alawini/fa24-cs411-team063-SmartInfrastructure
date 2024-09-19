@@ -2,11 +2,13 @@
 
 ## 1. Project Title
 
-Guess the NBA Player Game
+Role Player - Guess the NBA Player
 
 ## 2. Project Summary
 
-The Guess the NBA Player Game is an interactive web application where users guess a NBA player based on their statistical performance. Players make educated guesses using key stats like points per game, rebounds, assists, and shooting percentages. The game provides feedback through a color-coded system, helping users refine their guesses. This engaging platform offers a unique way for basketball fans to test their knowledge of player statistics and explore the rich data of the NBA.
+The Role Player game is an interative web-based game where users are tasked with guessing an unknown NBA player based on various stats. The game flow will have the user guess a random NBA player, and the game will output whether or not the guessed players' stats (i.e: points per game, assists per game, height, position, etc.) are less than, greater than, or very close/equal to the unknown NBA player (A color gradient will signify one of these conditions). Based on this information, the player can then guess another NBA player that they believe have the relative stats compared to what they guessed previously.
+
+The win condition of the game is to guess the correct NBA player. Columns shown will most liekly be points per game, assists per game, rebounds per game, position, college drafted from, along with other miscellaneous stats.
 
 ## 3. Description
 
