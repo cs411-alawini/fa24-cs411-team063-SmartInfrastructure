@@ -44,10 +44,11 @@ Data will be sourced from:
    - Size: Comprehensive stats for all active players (500+) and historical players (4000+)
    - Information: Game logs, advanced stats, shot chart data
 
-2. Basketball Reference
+2. Kaggle NBA Database
+   https://www.kaggle.com/datasets/wyattowalsh/basketball
    - Format: CSV exports
-   - Size: Career stats for all NBA players (4000+)
-   - Information: Basic and advanced career statistics, awards, biographical info
+   - Size: Career stats for all NBA players (4000+ rows per file)
+   - Information: Players, Teams, Games, Player Stats, etc.
 
 ## 7. Functionality
 
