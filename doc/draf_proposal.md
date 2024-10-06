@@ -1,4 +1,5 @@
 
+
 # NBA Team Builder
 
 ## 1. Project Title
@@ -48,10 +49,17 @@ Data will be sourced from:
    - Format: CSV exports
    - Size: Career stats for all NBA players (4000+ rows per file)
    - Information: Players, Teams, Games, Player Stats, etc.
+ 
  3. Scraped Data from Basketball-Reference
 	-	Format: CSV exports & Excel sheets
 	-	Size: Salaries and colleges for each player
 	-	Information: Yearly salaries for each player every year + colleges attended
+
+**CRUD**
+Create - Users will be able to create teams which would be stored in a user-teams table which holds all the user input data
+Read - When looking at previous days / challenges, Users will be able to access other user's information by reading from team tables to see other's solutions.
+Update - If another submission for a team beats the score of one's previous attempt, it will update the submitted team in the table to the new team.
+Delete - If a user decides to delete their account, all their corresponding teams will be deleted with their account.
 
 ## 7. Functionality
 
