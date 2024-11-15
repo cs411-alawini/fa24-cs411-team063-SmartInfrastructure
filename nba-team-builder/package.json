@@ -1,6 +1,9 @@
 {
     "scripts": {
-      "client": "npm start --prefix client",
-      "server": "npm start --prefix server"
+        "client": "npm start --prefix client",
+        "server": "npm start --prefix server"
+    },
+    "dependencies": {
+        "mysql2": "^3.11.4"
     }
-  }
+}
