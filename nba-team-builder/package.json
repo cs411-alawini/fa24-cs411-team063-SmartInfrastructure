@@ -4,6 +4,7 @@
         "server": "npm start --prefix server"
     },
     "dependencies": {
+        "cors": "^2.8.5",
         "mysql2": "^3.11.4"
     }
 }

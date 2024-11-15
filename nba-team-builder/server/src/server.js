@@ -9,6 +9,10 @@ require('dotenv').config();
 app.use(express.json())
 
 
+const cors = require('cors');
+// Enable CORS for all origins
+app.use(cors());
+
 // connection pool for connecting to MySQL database
 const pool = mysql.createPool({
     // environment variable info (sensitive data)
@@ -69,6 +73,21 @@ app.get('/api/players', (req, res) => {
     });
 });
 
+// player headshot GET call (accepts person_id)
+app.get('/api/player-headshot', (req, res) => {
+  const { person_id } = req.query;
+
+  if (!person_id) {
+    return res.status(400).json({ error: 'person_id is required' });
+  }
+
+  // Construct the headshot URL
+  const headshotUrl = `https://cdn.nba.com/headshots/nba/latest/1040x760/${person_id}.png`;
+
+  res.json({ headshotUrl });
+});
+
+
 // test route
 app.get('/', (req, res) => {
     // response which is sent
@@ -76,7 +95,7 @@ app.get('/', (req, res) => {
 });
   
 // Start the server and listen on a specified port
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
