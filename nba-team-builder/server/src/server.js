@@ -8,6 +8,8 @@ require('dotenv').config();
 // middleware to allow req to have nice and neat attributes
 app.use(express.json())
 
+
+// connection pool for connecting to MySQL database
 const pool = mysql.createPool({
     // environment variable info (sensitive data)
     host: process.env.DB_HOST || 'YOUR_INSTANCE_IP_ADDRESS',
@@ -21,8 +23,42 @@ const pool = mysql.createPool({
     queueLimit: 0, // unlimited # of queued requests if no connections are available
 });
 
+// GET call for players
 app.get('/api/players', (req, res) => {
-    pool.query('SELECT * FROM players', (err, results) => {
+    const { first_name, last_name, position, team_id, draft_year, person_id } = req.query;
+
+    // Create the SQL query
+    let sql = 'SELECT * FROM players WHERE 1=1';
+  const params = [];
+
+  // Dynamically add conditions based on provided parameters
+  if (first_name) {
+    sql += ' AND first_name LIKE ?';
+    params.push(`%${first_name}%`);
+  }
+  if (last_name) {
+    sql += ' AND last_name LIKE ?';
+    params.push(`%${last_name}%`);
+  }
+  if (position) {
+    sql += ' AND position LIKE ?';
+    params.push(`%${position}%`);
+  }
+  if (team_id) {
+    sql += ' AND team_id = ?';
+    params.push(Number(team_id));
+  }
+  if (draft_year) {
+    sql += ' AND draft_year = ?';
+    params.push(Number(draft_year));
+  }
+  if (person_id) {
+    sql += ' AND person_id = ?';
+    params.push(Number(person_id));
+  }
+
+
+    pool.query(sql, params, (err, results) => {
         // error catching
         if (err) {
         console.error('Error fetching players:', err);
