@@ -30,6 +30,8 @@ const App: React.FC = () => {
   // AuthForm states
   const [isAuthFormVisible, setAuthFormVisible] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState('');
 
 
 
@@ -169,17 +171,29 @@ const App: React.FC = () => {
       console.error("Error validating team:", error);
     }
   };
+
+  // Handle Login Behavior
+  const handleLogin = (user: string) => {
+    setIsLoggedIn(true);
+    setUsername(user);
+    setAuthFormVisible(false); // Hide the AuthForm after login
+  };
   
 
 // Build the app using our components
 return (
   <>
-    <HeaderBar onOpenAuthForm={() => setAuthFormVisible(true)} />
+    <HeaderBar
+      onOpenAuthForm={() => setAuthFormVisible(true)}
+      isLoggedIn={isLoggedIn}
+      username={username}
+    />
     {isAuthFormVisible && (
       <AuthForm
         onClose={() => setAuthFormVisible(false)}
         isRegistering={isRegistering}
         setIsRegistering={setIsRegistering}
+        onLogin={handleLogin}
       />
     )}
     <div className="app-container">
@@ -195,7 +209,7 @@ return (
       <ErrorMessage message={error} />
       <PlayerSlots players={players} onRemovePlayer={handleRemovePlayer} />
       <TotalSalary totalSalary={calculateTotalSalary()} />
-      <button onClick={handleSubmitTeam}>Submit Team</button>
+      <button className="submit-button" onClick={handleSubmitTeam}>Submit Team</button>
     </div>
   </>
 );

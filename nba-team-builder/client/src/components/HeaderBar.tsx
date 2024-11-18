@@ -3,15 +3,25 @@ import './styles/HeaderBar.css';
 
 interface HeaderBarProps {
   onOpenAuthForm: () => void;
+  isLoggedIn: boolean;
+  username: string;
 }
 
-const HeaderBar: React.FC<HeaderBarProps> = ({ onOpenAuthForm }) => {
+const HeaderBar: React.FC<HeaderBarProps> = ({ onOpenAuthForm , isLoggedIn, username}) => {
   return (
     <header className="header-bar">
       <h1>NBA Team Builder</h1>
-      <button className="header-text" onClick={onOpenAuthForm}>
-        Login/Register
-      </button>
+      <div className="header-text">
+        {isLoggedIn ? (
+          <span>Welcome, {username}</span>
+        ) : (
+          <button className="header-text" onClick={onOpenAuthForm}>
+            Login/Register
+          </button>
+        )
+        }
+
+      </div>
     </header>
   );
 };

@@ -5,9 +5,10 @@ interface AuthFormProps {
   onClose: () => void; // Function to close the popup
   isRegistering: boolean;
   setIsRegistering: (isRegistering: boolean) => void;
+  onLogin: (username: string) => void;
 }
 
-const AuthForm: React.FC<AuthFormProps> = ({ onClose, isRegistering, setIsRegistering }) => {
+const AuthForm: React.FC<AuthFormProps> = ({ onClose, isRegistering, setIsRegistering, onLogin}) => {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [username, setUsername] = React.useState('');
@@ -32,9 +33,22 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose, isRegistering, setIsRegist
       });
 
       const data = await response.json();
+      console.log(data);
       if (!response.ok) throw new Error(data.error);
 
       setMessage(data.message);
+
+      // Updates username for header
+      if(isRegistering) {
+        onLogin(username);
+      } else {
+        const loginUsername = data.user.username;
+        if(loginUsername) {
+          onLogin(loginUsername);
+          onClose(); // close the AuthForm
+        }
+      }
+
     } catch (err) {
       const error = err as Error;
       setMessage(error.message || 'Something went wrong');
