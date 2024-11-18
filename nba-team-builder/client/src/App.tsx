@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './App.css'
+import prompts from './data/prompts'
 
 
 // Import tsx components
@@ -8,11 +9,16 @@ import SearchBar from './components/SearchBar';
 import PlayerSlots from './components/PlayerSlots';
 import TotalSalary from './components/TotalSalary';
 import ErrorMessage from './components/ErrorMessage';
+import PromptBox from './components/PromptBox';
+import { generateDescription } from './utils/generateDescription';
 
 const App: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
-  const [players, setPlayers] = useState<Array<any | null>>(Array(5).fill(null)); // 5 empty slots
+  const [selectedPrompt, setSelectedPrompt] = useState(prompts[0]); // set prompt based on what's in prompts.ts
+  const [players, setPlayers] = useState<Array<any | null>>(
+    Array(5).fill({ player_id: null, valid: null }) // Initialize players with valid set to null
+  );
   const [error, setError] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -32,7 +38,7 @@ const App: React.FC = () => {
         setError(errorData.error || 'An error occurred while searching players.');
         return;
       }
-
+      
       const data = await response.json();
       setSearchResults(data); // Update the dropdown results
     } catch (err) {
@@ -45,12 +51,13 @@ const App: React.FC = () => {
     setError(null);
     setSearchTerm(''); // Clear the search bar
     setSearchResults([]); // Clear the dropdown
-
-    // Find the first empty slot and fill it with the selected player
+  
+    // Find the first empty slot (where player_id is null) and fill it with the selected player
     const updatedPlayers = [...players];
-    const emptyIndex = updatedPlayers.findIndex((slot) => slot === null);
+    const emptyIndex = updatedPlayers.findIndex((slot) => slot.player_id === null);
+  
     if (emptyIndex !== -1) {
-      updatedPlayers[emptyIndex] = player;
+      updatedPlayers[emptyIndex] = { ...player, valid: null }; // Add player with valid set to null
       setPlayers(updatedPlayers);
     } else {
       setError('All slots are already filled. Please remove a player to add another.');
@@ -59,12 +66,19 @@ const App: React.FC = () => {
 
   // Function to remove a player and cascade remaining players to the left
   const handleRemovePlayer = (index: number) => {
-    const updatedPlayers = players.filter((_, idx) => idx !== index); // Remove the player at the index
-    while (updatedPlayers.length < 5) {
-      updatedPlayers.push(null); // Ensure there are always 5 slots
-    }
-    setPlayers(updatedPlayers);
+    setPlayers((prevPlayers) => {
+      const updatedPlayers = [...prevPlayers];
+  
+      // Remove the player at the specified index
+      updatedPlayers.splice(index, 1);
+  
+      // Add an empty slot at the end to maintain 5 slots
+      updatedPlayers.push({ player_id: null, valid: null });
+  
+      return updatedPlayers;
+    });
   };
+  
 
   // Calculate total salary cost
   const calculateTotalSalary = () => {
@@ -93,9 +107,59 @@ const App: React.FC = () => {
     };
   }, []);
 
+
+
+  const generateRequestBody = () => {
+    return {
+      team: players.map(player => player?.player_id), // Extract player IDs from the team array
+      criteria: selectedPrompt.criteria,          // Use criteria from the selected prompt
+      logicalOperator: selectedPrompt.logicalOperator || "AND" // Default to AND if not specified
+    };
+  };
+
+  // Handle team validation after team is submitted
+  const handleSubmitTeam = async () => {
+    try {
+      const payload = generateRequestBody(); // Generate the request body
+  
+      const response = await fetch("http://localhost:5000/api/validate-team", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload), // Send the generated payload
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Error: ${response.statusText}`);
+      }
+  
+      const result = await response.json();
+      console.log("Validation result:", result);
+  
+      // Update players state with validation results
+      setPlayers((prevPlayers) =>
+        prevPlayers.map((player, index) => {
+          const updatedPlayer = result.team.find(
+            (p: any) => p.player_id === player?.player_id
+          );
+          return {
+            ...player,
+            valid: updatedPlayer?.valid ?? null, // Update valid status or set to null if not found
+          };
+        })
+      );
+    } catch (error) {
+      console.error("Error validating team:", error);
+    }
+  };
+  
+
+// Build the app using our components
   return (
     <div className="app-container">
       <Header />
+      <PromptBox description={generateDescription(selectedPrompt)} />
       <SearchBar
         searchTerm={searchTerm}
         onSearchChange={handleSearchChange}
@@ -106,6 +170,7 @@ const App: React.FC = () => {
       <ErrorMessage message={error} />
       <PlayerSlots players={players} onRemovePlayer={handleRemovePlayer} />
       <TotalSalary totalSalary={calculateTotalSalary()} />
+      <button onClick={handleSubmitTeam}>Submit Team</button>
     </div>
   );
 };

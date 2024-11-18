@@ -30,6 +30,25 @@ h1 {
   margin-bottom: 20px;
 }
 
+.prompt-box {
+  border: 1px solid #555; /* Thin dark-grey border */
+  border-radius: 8px; /* Rounded corners */
+  padding: 20px; /* Add some space inside the box */
+  background-color: #f9f9f9; /* Light grey background */
+  width: 100%; /* Make it responsive */
+  max-width: 400px; /* Limit the maximum width */
+  text-align: center; /* Center the text */
+  margin: 20px auto; /* Center the box horizontally and add spacing */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for a modern look */
+}
+
+.prompt-text {
+  font-size: 1.25rem; /* Slightly larger font size */
+  font-weight: bold; /* Make it stand out */
+  color: #333; /* Dark text color for readability */
+  margin: 0; /* Remove default margins */
+}
+
 .search-container {
   position: relative;
   margin-bottom: 20px;
@@ -61,10 +80,18 @@ h1 {
 }
 
 .search-result {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   padding: 10px;
-  font-size: 1rem;
   cursor: pointer;
   border-bottom: 1px solid #eee;
+}
+
+.search-result img {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
 }
 
 .search-result:last-child {
@@ -103,6 +130,19 @@ h1 {
   margin: 5px;
   padding: 10px;
 }
+
+.player-slot {
+  transition: background-color 0.5s ease; /* Smooth transition for background changes */
+}
+
+.player-slot.valid {
+  background-color: lightgreen; /* Green for valid players */
+}
+
+.player-slot.invalid {
+  background-color: red; /* Red for invalid players */
+}
+
 
 .player-image {
   width: 75%;
@@ -145,7 +185,13 @@ h1 {
 .player-name {
   font-size: 1rem;
   font-weight: bold;
-  margin: 5px 0;
+  margin: 3px 0;
+  padding-top: 5px;
+}
+
+.player-team {
+  font-size: 0.75rem;
+  margin: 2px 0;
 }
 
 .player-salary {

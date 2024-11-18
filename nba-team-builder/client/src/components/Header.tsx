@@ -2,7 +2,7 @@ import React from 'react';
 
 const Header: React.FC = () => (
   <header>
-    <h1>Your Team</h1>
+    <h1>NBA Team Builder</h1>
   </header>
 );
 

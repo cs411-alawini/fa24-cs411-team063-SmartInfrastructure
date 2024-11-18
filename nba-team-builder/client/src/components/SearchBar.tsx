@@ -8,6 +8,10 @@ interface SearchBarProps {
   clearSearch: () => void;
 }
 
+// Fetches URL for team's logo based on teamId
+const getTeamLogoUrl = (teamId: string) =>
+    `https://cdn.nba.com/logos/nba/${teamId}/primary/L/logo.svg`;
+
 const SearchBar: React.FC<SearchBarProps> = ({
   searchTerm,
   onSearchChange,
@@ -47,8 +51,14 @@ const SearchBar: React.FC<SearchBarProps> = ({
               key={player.player_id}
               className="search-result"
               onClick={() => onPlayerSelect(player)}
+              style={{ display: 'flex', alignItems: 'center', gap: '10px' }}
             >
-              {player.first_name} {player.last_name}
+              <img
+                src={getTeamLogoUrl(player.team_id)}
+                alt={`${player.team_name} logo`}
+                style={{ width: '24px', height: '24px', borderRadius: '50%' }}
+              />
+              <span>{player.first_name} {player.last_name}</span>
             </div>
           ))}
         </div>
