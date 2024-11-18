@@ -11,6 +11,7 @@ import TotalSalary from './components/TotalSalary';
 import ErrorMessage from './components/ErrorMessage';
 import PromptBox from './components/PromptBox';
 import { generateDescription } from './utils/generateDescription';
+import AuthForm from './components/AuthForm';
 
 const App: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -21,6 +22,10 @@ const App: React.FC = () => {
   );
   const [error, setError] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // AuthForm states
+  const [isAuthFormVisible, setAuthFormVisible] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
 
   // Function to fetch players for the search term
   const fetchSearchResults = async (term: string) => {
@@ -156,9 +161,17 @@ const App: React.FC = () => {
   
 
 // Build the app using our components
-  return (
+return (
+  <>
+    <Header onOpenAuthForm={() => setAuthFormVisible(true)} />
+    {isAuthFormVisible && (
+      <AuthForm
+        onClose={() => setAuthFormVisible(false)}
+        isRegistering={isRegistering}
+        setIsRegistering={setIsRegistering}
+      />
+    )}
     <div className="app-container">
-      <Header />
       <PromptBox description={generateDescription(selectedPrompt)} />
       <SearchBar
         searchTerm={searchTerm}
@@ -172,7 +185,8 @@ const App: React.FC = () => {
       <TotalSalary totalSalary={calculateTotalSalary()} />
       <button onClick={handleSubmitTeam}>Submit Team</button>
     </div>
-  );
+  </>
+);
 };
 
 export default App;

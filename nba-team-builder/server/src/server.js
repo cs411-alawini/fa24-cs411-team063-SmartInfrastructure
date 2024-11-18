@@ -201,7 +201,59 @@ app.post('/api/validate-team', async (req, res) => {
   }
 });
 
+// Route to create a new account
+app.post('/api/register', async (req, res) => {
+  const { username, email, password } = req.body;
 
+  if (!username || !email || !password) {
+    return res.status(400).json({ error: 'All fields are required' });
+  }
+
+  try {
+    // Check if the email already exists
+    const checkSql = `SELECT * FROM users WHERE email = ?`;
+    const [existingUser] = await pool.query(checkSql, [email]);
+
+    if (existingUser.length > 0) {
+      return res.status(400).json({ error: 'Email already in use' });
+    }
+
+    // Save the new user
+    const insertSql = `INSERT INTO users (username, email, password) VALUES (?, ?, ?)`;
+    await pool.query(insertSql, [username, email, password]);
+
+    res.status(201).json({ message: 'User registered successfully' });
+  } catch (err) {
+    console.error('Error registering user:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Route to log in
+app.post('/api/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email and password are required' });
+  }
+
+  try {
+    // Check if the user exists
+    const sql = `SELECT * FROM users WHERE email = ? AND password = ?`;
+    const [results] = await pool.query(sql, [email, password]);
+
+    if (results.length === 0) {
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+
+    // Successful login
+    const user = results[0];
+    res.json({ message: 'Login successful', user });
+  } catch (err) {
+    console.error('Error logging in:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 
 

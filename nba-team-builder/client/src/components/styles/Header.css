@@ -1,0 +1,23 @@
+.header-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%; /* Ensure the header spans the width of the screen */
+    height: 60px; /* Adjust as necessary */
+    background-color: #007bff;
+    color: white;
+    display: flex;
+    justify-content: space-between; /* Distribute space evenly between elements */
+    align-items: center;
+    padding: 0 20px; /* Add padding inside the header */
+    box-sizing: border-box; /* Ensure padding does not affect width */
+    z-index: 1000;
+  }
+  
+  .gear-icon {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px; /* Adjust size */
+    cursor: pointer;
+  }

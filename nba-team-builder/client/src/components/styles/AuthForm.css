@@ -1,0 +1,105 @@
+/* Full-screen overlay */
+.auth-form-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Ensure it's above other elements */
+  }
+  
+  /* Modal container */
+  .auth-form-container {
+    background-color: #fff; /* White background for the modal */
+    padding: 20px;
+    border-radius: 10px;
+    width: 350px; /* Fixed width for the modal */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25); /* Subtle shadow for depth */
+    position: relative;
+    text-align: center;
+  }
+  
+  /* Close button in top-right corner */
+  .close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 20px; /* Size of the close "✖" icon */
+    cursor: pointer;
+    color: #333; /* Default color */
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  .close-button:hover {
+    background-color: rgba(0, 0, 0, 0.1); /* Light gray background on hover */
+    color: #000;
+  }
+  
+  /* Form inputs */
+  .auth-form-container input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    box-sizing: border-box;
+  }
+  
+  /* Submit button */
+  .auth-form-container button[type='submit'] {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff; /* Primary blue */
+    color: #fff; /* White text */
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .auth-form-container button[type='submit']:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+  }
+  
+  /* Toggle between login/register */
+  .auth-form-container p {
+    margin-top: 15px;
+    font-size: 14px;
+  }
+  
+  .auth-form-container p button {
+    background: none;
+    border: none;
+    color: #007bff;
+    cursor: pointer;
+    text-decoration: underline;
+    font-size: 14px;
+  }
+  
+  .auth-form-container p button:hover {
+    color: #0056b3; /* Darker blue on hover */
+  }
+  
+  /* Message (success or error) */
+  .auth-form-message {
+    margin-top: 15px;
+    font-size: 14px;
+    color: red; /* Red color for error messages */
+    text-align: center;
+  }
+  

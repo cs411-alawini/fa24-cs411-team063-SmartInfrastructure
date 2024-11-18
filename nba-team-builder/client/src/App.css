@@ -23,6 +23,22 @@ body {
   width: 100%;
   max-width: 1000px;
   height: 100%; /* Ensure it takes the full height of the parent */
+  margin-top: 60px;
+}
+
+.header-bar {
+  position: fixed; /* Keep the header at the top */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background-color: #007bff;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  z-index: 1000;
 }
 
 h1 {
