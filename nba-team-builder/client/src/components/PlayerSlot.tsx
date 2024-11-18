@@ -19,7 +19,7 @@ const PlayerSlot: React.FC<PlayerSlotProps> = ({ player, onRemove }) => {
       className="player-slot"
       style={{
         backgroundColor,
-        transition: 'background-color 0.5s ease', // Smooth transition for color changes
+        transition: 'background-color 0.25s ease', // Smooth transition for color changes
       }}
     >
       <div className="player-container">
@@ -48,7 +48,7 @@ const PlayerSlot: React.FC<PlayerSlotProps> = ({ player, onRemove }) => {
       <p className="player-salary">
         {player.salary
           ? `Salary: $${Number(player.salary).toLocaleString()}`
-          : 'Salary not available'}
+          : ''}
       </p>
       <p className="player-status">
         {player.valid === true

@@ -1,18 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './App.css'
-import prompts from './data/prompts'
 
 
 // Import tsx components
-import Header from './components/Header';
+import HeaderBar from './components/HeaderBar';
 import SearchBar from './components/SearchBar';
 import PlayerSlots from './components/PlayerSlots';
 import TotalSalary from './components/TotalSalary';
 import ErrorMessage from './components/ErrorMessage';
 import PromptBox from './components/PromptBox';
-import { generateDescription } from './utils/generateDescription';
 import AuthForm from './components/AuthForm';
 
+import prompts from './data/prompts'
+import { generateDescription } from './utils/generateDescription';
 
 // Variables
 var promptIndex = 0;
@@ -174,7 +174,7 @@ const App: React.FC = () => {
 // Build the app using our components
 return (
   <>
-    <Header onOpenAuthForm={() => setAuthFormVisible(true)} />
+    <HeaderBar onOpenAuthForm={() => setAuthFormVisible(true)} />
     {isAuthFormVisible && (
       <AuthForm
         onClose={() => setAuthFormVisible(false)}
