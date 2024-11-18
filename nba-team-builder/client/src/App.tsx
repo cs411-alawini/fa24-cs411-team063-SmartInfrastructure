@@ -183,6 +183,7 @@ return (
       />
     )}
     <div className="app-container">
+      <h1>Create the cheapest team following these rules</h1>
       <PromptBox description={generateDescription(selectedPrompt)} onClick={cyclePrompt} />
       <SearchBar
         searchTerm={searchTerm}

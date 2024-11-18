@@ -16,12 +16,10 @@ const prompts: Prompt[] = [
     logicalOperator: "AND",
   },
   {
-    id: "double_double",
+    id: "ppg_above_1",
     criteria: [
-      { stat: "PTS", operator: ">=", value: 10 },
-      { stat: "REB", operator: ">=", value: 10 },
+      { stat: "PTS", operator: ">=", value: 1 },
     ],
-    logicalOperator: "AND",
   },
   {
     id: "apg_or_reb_above_5",
