@@ -13,10 +13,14 @@ import PromptBox from './components/PromptBox';
 import { generateDescription } from './utils/generateDescription';
 import AuthForm from './components/AuthForm';
 
+
+// Variables
+var promptIndex = 0;
+
 const App: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
-  const [selectedPrompt, setSelectedPrompt] = useState(prompts[0]); // set prompt based on what's in prompts.ts
+  const [selectedPrompt, setSelectedPrompt] = useState(prompts[promptIndex]); // set prompt based on what's in prompts.ts
   const [players, setPlayers] = useState<Array<any | null>>(
     Array(5).fill({ player_id: null, valid: null }) // Initialize players with valid set to null
   );
@@ -26,6 +30,9 @@ const App: React.FC = () => {
   // AuthForm states
   const [isAuthFormVisible, setAuthFormVisible] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
+
+
+
 
   // Function to fetch players for the search term
   const fetchSearchResults = async (term: string) => {
@@ -112,7 +119,11 @@ const App: React.FC = () => {
     };
   }, []);
 
-
+  // Cycles through prompts
+  const cyclePrompt = () => {
+    promptIndex = (promptIndex + 1) % prompts.length;
+    setSelectedPrompt(prompts[promptIndex]);
+  }
 
   const generateRequestBody = () => {
     return {
@@ -172,7 +183,7 @@ return (
       />
     )}
     <div className="app-container">
-      <PromptBox description={generateDescription(selectedPrompt)} />
+      <PromptBox description={generateDescription(selectedPrompt)} onClick={cyclePrompt} />
       <SearchBar
         searchTerm={searchTerm}
         onSearchChange={handleSearchChange}

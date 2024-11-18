@@ -23,7 +23,6 @@ body {
   width: 100%;
   max-width: 1000px;
   height: 100%; /* Ensure it takes the full height of the parent */
-  margin-top: 60px;
 }
 
 .header-bar {
