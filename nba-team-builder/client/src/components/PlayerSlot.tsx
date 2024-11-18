@@ -1,4 +1,5 @@
 import React from 'react';
+import './styles/PlayerSlot.css'
 
 interface PlayerSlotProps {
   player: any | null;

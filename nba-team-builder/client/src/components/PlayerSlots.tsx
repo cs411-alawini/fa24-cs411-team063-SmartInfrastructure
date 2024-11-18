@@ -1,5 +1,6 @@
 import React from 'react';
 import PlayerSlot from './PlayerSlot';
+import './styles/PlayerSlots.css'
 
 interface PlayerSlotsProps {
   players: (any | null)[];

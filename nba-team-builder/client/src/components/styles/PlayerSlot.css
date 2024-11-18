@@ -1,0 +1,91 @@
+.player-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    background: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 150px;
+    margin: 5px;
+    padding: 10px;
+  }
+  
+  .player-container {
+    position: relative;
+    width: 200px;
+    height: 150px;
+  }
+  
+  .player-slot {
+    transition: background-color 0.5s ease; /* Smooth transition for background changes */
+  }
+  
+  .player-slot.valid {
+    background-color: lightgreen; /* Green for valid players */
+  }
+  
+  .player-slot.invalid {
+    background-color: red; /* Red for invalid players */
+  }
+  
+  
+  .player-image {
+    width: 75%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+  
+  .remove-button {
+    position: absolute;
+    top: -15px;
+    right: 5px;
+    background: red;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  /* Hide the remove button by default */
+  .remove-button {
+    display: none;
+  }
+  
+  /* Show the remove button only when hovering over a player slot */
+  .player-slot:hover .remove-button {
+    display: flex; /* Change from none to flex to maintain centering */
+  }
+  
+  .remove-button:hover {
+    background: darkred;
+  }
+  
+  .player-name {
+    font-size: 1rem;
+    font-weight: bold;
+    margin: 3px 0;
+    padding-top: 5px;
+  }
+  
+  .player-team {
+    font-size: 0.75rem;
+    margin: 2px 0;
+  }
+  
+  .player-salary {
+    font-size: 0.9rem;
+    color: #555;
+  }
+  
+  .empty-slot {
+    font-size: 1rem;
+    color: #aaa;
+  }

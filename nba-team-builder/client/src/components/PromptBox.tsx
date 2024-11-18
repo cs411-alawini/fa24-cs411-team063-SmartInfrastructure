@@ -1,4 +1,5 @@
 import React from 'react';
+import './styles/PromptBox.css'
 
 interface PromptBoxProps {
   description: string; // The prompt description to display
