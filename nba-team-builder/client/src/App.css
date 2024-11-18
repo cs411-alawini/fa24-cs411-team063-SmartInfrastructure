@@ -6,53 +6,154 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
   height: 100vh;
 }
 
 .app-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* Vertically center children */
   text-align: center;
   background: white;
   border-radius: 10px;
   padding: 20px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  width: 90%;
-  max-width: 500px;
+  width: 100%;
+  max-width: 1000px;
+  height: 100%; /* Ensure it takes the full height of the parent */
 }
 
 h1 {
-  font-size: 1.8rem;
+  font-size: 2rem;
   margin-bottom: 20px;
 }
 
-input {
-  width: 80%;
+.search-container {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.search-bar {
+  width: 100%;
+  max-width: 400px;
   padding: 10px;
-  margin: 10px 0;
+  font-size: 1rem;
   border: 1px solid #ccc;
   border-radius: 5px;
-  font-size: 1rem;
 }
 
-button {
-  padding: 10px 20px;
-  background-color: #007bff;
-  border: none;
+.search-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%); /* Centers the dropdown under the search bar */
+  width: 100%;
+  max-width: 400px;
+  background: white;
+  border: 1px solid #ccc;
   border-radius: 5px;
-  color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.search-result {
+  padding: 10px;
   font-size: 1rem;
   cursor: pointer;
-  transition: background-color 0.3s;
+  border-bottom: 1px solid #eee;
 }
 
-button:hover {
-  background-color: #0056b3;
+.search-result:last-child {
+  border-bottom: none;
 }
 
-img {
-  margin-top: 20px;
+.search-result:hover {
+  background: #f5f5f5;
+}
+
+
+.player-container {
+  position: relative;
+  width: 200px;
+  height: 150px;
+}
+
+.player-slots {
+  display: flex;
+  justify-content: center; /* Horizontally center the slots */
+  align-items: center; /* Vertically center the slots if necessary */
+  flex-wrap: wrap; /* Wrap to a new line if slots exceed the container width */
+  gap: 10px; /* Add spacing between slots */
+  width: 100%; /* Take full width of the container */
+}
+
+.player-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: #f9f9f9;
   border-radius: 10px;
-  width: 100%;
-  max-width: 300px;
-  height: auto;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 150px;
+  margin: 5px;
+  padding: 10px;
+}
+
+.player-image {
+  width: 75%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.remove-button {
+  position: absolute;
+  top: -15px;
+  right: 5px;
+  background: red;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Hide the remove button by default */
+.remove-button {
+  display: none;
+}
+
+/* Show the remove button only when hovering over a player slot */
+.player-slot:hover .remove-button {
+  display: flex; /* Change from none to flex to maintain centering */
+}
+
+.remove-button:hover {
+  background: darkred;
+}
+
+.player-name {
+  font-size: 1rem;
+  font-weight: bold;
+  margin: 5px 0;
+}
+
+.player-salary {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.empty-slot {
+  font-size: 1rem;
+  color: #aaa;
 }

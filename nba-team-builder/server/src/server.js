@@ -27,64 +27,47 @@ const pool = mysql.createPool({
     queueLimit: 0, // unlimited # of queued requests if no connections are available
 });
 
-// GET call for players
+// Search Bar Endpoint
 app.get('/api/players', (req, res) => {
-    const { first_name, last_name, position, team_id, draft_year, person_id } = req.query;
+  const { first_name } = req.query;
 
-    // Create the SQL query
-    let sql = 'SELECT * FROM players WHERE 1=1';
+  if (!first_name) {
+    return res.status(400).json({ error: 'Search term is required' });
+  }
+
+  // Split search term by spaces
+  const terms = first_name.split(' ');
+  let sql = `
+    SELECT 
+      players.*
+    FROM 
+      players 
+    WHERE 1=1
+  `;
   const params = [];
 
-  // Dynamically add conditions based on provided parameters
-  if (first_name) {
-    sql += ' AND first_name LIKE ?';
-    params.push(`%${first_name}%`);
-  }
-  if (last_name) {
-    sql += ' AND last_name LIKE ?';
-    params.push(`%${last_name}%`);
-  }
-  if (position) {
-    sql += ' AND position LIKE ?';
-    params.push(`%${position}%`);
-  }
-  if (team_id) {
-    sql += ' AND team_id = ?';
-    params.push(Number(team_id));
-  }
-  if (draft_year) {
-    sql += ' AND draft_year = ?';
-    params.push(Number(draft_year));
-  }
-  if (person_id) {
-    sql += ' AND person_id = ?';
-    params.push(Number(person_id));
+  if (terms.length === 1) {
+    // Single term: match either first or last name, or the combined first and last name
+    sql += ' AND (players.first_name LIKE ? OR players.last_name LIKE ? OR players.first_and_last_name LIKE ?)';
+    params.push(`%${terms[0]}%`, `%${terms[0]}%`, `%${terms[0]}%`);
+  } else if (terms.length >= 2) {
+    // Two terms: match the exact first_and_last_name or separately match first and last name
+    sql += ' AND (players.first_and_last_name LIKE ? OR (players.first_name LIKE ? AND players.last_name LIKE ?))';
+    params.push(`%${terms.join(' ')}%`, `%${terms[0]}%`, `%${terms[1]}%`);
   }
 
+  // additional filter to not display accidental uploaded data
+  sql += ` AND players.first_and_last_name != ?`;
+  params.push('first_and_last_name');
 
-    pool.query(sql, params, (err, results) => {
-        // error catching
-        if (err) {
-        console.error('Error fetching players:', err);
-        return res.status(500).send('An error occurred while fetching users.');
-        }
-        // return results if no error
-        res.json(results);
-    });
-});
+  pool.query(sql, params, (err, results) => {
+    if (err) {
+      console.error('Error fetching players:', err);
+      return res.status(500).send('An error occurred while fetching players.');
+    }
 
-// player headshot GET call (accepts person_id)
-app.get('/api/player-headshot', (req, res) => {
-  const { person_id } = req.query;
-
-  if (!person_id) {
-    return res.status(400).json({ error: 'person_id is required' });
-  }
-
-  // Construct the headshot URL
-  const headshotUrl = `https://cdn.nba.com/headshots/nba/latest/1040x760/${person_id}.png`;
-
-  res.json({ headshotUrl });
+    res.json(results); // Return all matched results with detailed information
+  });
 });
 
 
