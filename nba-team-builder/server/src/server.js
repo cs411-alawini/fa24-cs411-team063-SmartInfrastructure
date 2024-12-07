@@ -256,13 +256,59 @@ app.post('/api/login', async (req, res) => {
 });
 
 
+// TEMP ENDPOINT FOR GETTING USERS
+app.get('/api/users', async (req, res) => {
+  try {
+    // Define the SQL query
+    const sql = 'SELECT * FROM users'; // Avoid selecting the password for security
+
+    // Execute the query using the pool
+    const [results] = await pool.query(sql);
+
+    // Send the results as a JSON response
+    res.status(200).json(results);
+  } catch (err) {
+    console.error('Error fetching users:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+  
 
 
+// Route to create roster
+/*
+app.post('/api/roster', async (req, res) => {
+  const { players, user_id } = req.body;
 
+  // Ensure 'players' is an array and 'user_id' is provided
+  if (!Array.isArray(players) || !user_id) {
+    return res.status(400).send('Invalid input data');
+  }
 
+  let sqlRP = `INSERT INTO roster_player (player_id, user_id) VALUES`;
+  const placeholders = [];
+  const values = [];
 
+  players.forEach((player_id) => {
+    placeholders.push('(?, ?)');
+    values.push(player_id, user_id);
+  });
 
+  sqlRP += placeholders.join(', ');
 
+  try {
+    const [result] = await pool.query(sqlRP, values);
+    res.status(200);
+  } catch {
+    res.status(500);
+  }
+  
+
+  // let sql = `INSERT INTO rosters (roster_id, user_id) VALUES (?, ?)`
+
+  // const result = await pool.query(sql, [])
+})
+  */
   
 // Start the server and listen on a specified port
 const PORT = process.env.PORT || 5000;

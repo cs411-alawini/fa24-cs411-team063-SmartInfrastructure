@@ -13,9 +13,14 @@ import AuthForm from './components/AuthForm';
 
 import prompts from './data/prompts'
 import { generateDescription } from './utils/generateDescription';
+import Profile from './components/Profile';
+
+// Consts
+const ROSTER_SIZE = 5;
 
 // Variables
 var promptIndex = 0;
+
 
 const App: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -31,9 +36,13 @@ const App: React.FC = () => {
   const [isAuthFormVisible, setAuthFormVisible] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState('No Login');
 
+  // Profile Modal
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
 
+  const openProfile = () => setProfileModalOpen(true);
+  const closeProfile = () => setProfileModalOpen(false);
 
 
   // Function to fetch players for the search term
@@ -185,6 +194,7 @@ return (
   <>
     <HeaderBar
       onOpenAuthForm={() => setAuthFormVisible(true)}
+      openProfile={openProfile}
       isLoggedIn={isLoggedIn}
       username={username}
     />
@@ -194,6 +204,12 @@ return (
         isRegistering={isRegistering}
         setIsRegistering={setIsRegistering}
         onLogin={handleLogin}
+      />
+    )}
+    {profileModalOpen && (
+      <Profile
+        onClose={closeProfile}
+        username={username}
       />
     )}
     <div className="app-container">

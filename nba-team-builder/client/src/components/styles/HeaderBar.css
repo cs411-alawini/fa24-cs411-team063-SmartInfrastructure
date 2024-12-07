@@ -25,3 +25,21 @@
   .header-text:hover {
     opacity: 0.8;
   }
+
+  .profile-text {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px; /* Adjust size */
+    cursor: pointer;
+    margin: 10px;
+  }
+
+  .profile-text:hover {
+    opacity: 0.8;
+  }
+
+  .header-buttons {
+    display: flex;
+    
+  }
