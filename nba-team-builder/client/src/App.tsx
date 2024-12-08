@@ -37,6 +37,7 @@ const App: React.FC = () => {
   const [isRegistering, setIsRegistering] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('No Login');
+  const [user_id, setUser_id] = useState(0);
 
   // Profile Modal
   const [profileModalOpen, setProfileModalOpen] = useState(false);
@@ -168,11 +169,38 @@ const App: React.FC = () => {
       console.log("Validation result:", result);
       setPenaltyCost(Number(result.total_penalty));
   
+      // SUBMIT TEAM TO DATABASE
+      var prompt_id = promptIndex;
+      const rosterPayload = {
+        players: players.map((player) => player.player_id), // Extract player_id from players array
+        prompt_id: prompt_id, // Include the prompt_id from your request body
+        user_id: user_id, // Include the user_id from your request body
+        total_salary: result.total_salary,
+        total_penalty: result.total_penalty
+      };
+
+      console.log(rosterPayload);
+  
+      const rosterResponse = await fetch("http://localhost:5000/api/rosters", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(rosterPayload), // Send the roster payload
+      });
+  
+      if (!rosterResponse.ok) {
+        throw new Error(`Error submitting roster: ${rosterResponse.statusText}`);
+      }
+  
+      const rosterResult = await rosterResponse.json();
+      console.log("Roster created successfully:", rosterResult);
+  
       // Update players state with validation results
       setPlayers((prevPlayers) =>
-        prevPlayers.map((player, index) => {
+        prevPlayers.map((player) => {
           const updatedPlayer = result.team.find(
-            (p: any) => p.player_id === player?.player_id
+            (p: { player_id: number }) => p.player_id === player?.player_id
           );
           return {
             ...player,
@@ -181,18 +209,17 @@ const App: React.FC = () => {
         })
       );
     } catch (error) {
-      console.error("Error validating team:", error);
+      console.error("Error validating team or submitting roster:", error);
     }
     // Set submitbutton as pressed
     setIsTeamSubmitted(true);
-    
-
   };
 
   // Handle Login Behavior
-  const handleLogin = (user: string) => {
+  const handleLogin = (user: string, user_id: string) => {
     setIsLoggedIn(true);
     setUsername(user);
+    setUser_id(Number(user_id));
     setAuthFormVisible(false); // Hide the AuthForm after login
   };
   

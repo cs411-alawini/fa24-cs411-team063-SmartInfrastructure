@@ -275,40 +275,111 @@ app.get('/api/users', async (req, res) => {
   
 
 
-// Route to create roster
-/*
-app.post('/api/roster', async (req, res) => {
-  const { players, user_id } = req.body;
+// Route to get all rosters
+app.get('/api/rosters', async (req, res) => {
+  try {
+    // Query to fetch all rosters
+    const sql = `
+      SELECT r.roster_id, r.user_id, r.prompt_id, rp.player_id, r.total_salary, r.total_penalty
+      FROM rosters r
+      LEFT JOIN roster_players rp ON r.roster_id = rp.roster_id
+    `;
 
-  // Ensure 'players' is an array and 'user_id' is provided
-  if (!Array.isArray(players) || !user_id) {
+    const [rows] = await pool.query(sql);
+
+    // Organize the data: Group players by roster
+    const rosters = rows.reduce((acc, row) => {
+      const { roster_id, user_id, prompt_id, player_id, total_salary, total_penalty } = row;
+
+      if (!acc[roster_id]) {
+        // Initialize the roster object
+        acc[roster_id] = { 
+          roster_id, 
+          user_id, 
+          prompt_id, 
+          total_salary, 
+          total_penalty, 
+          players: [] 
+        };
+      }
+
+      // Add player_id to the players array
+      if (player_id) {
+        acc[roster_id].players.push(player_id);
+      }
+
+      return acc;
+    }, {});
+
+    res.status(200).json(Object.values(rosters)); // Send as an array
+  } catch (error) {
+    console.error('Error fetching rosters:', error);
+    res.status(500).send('An error occurred while fetching rosters');
+  }
+});
+
+
+// Route to create roster
+
+app.post('/api/rosters', async (req, res) => {
+  const { players, prompt_id, user_id, total_salary, total_penalty } = req.body;
+  console.log(req.body);
+
+  // Ensure required data is provided and valid
+  if (
+    prompt_id == null ||
+    user_id == null ||
+    total_salary == null ||
+    total_penalty == null ||
+    !Array.isArray(players)
+  ) {
     return res.status(400).send('Invalid input data');
   }
 
-  let sqlRP = `INSERT INTO roster_player (player_id, user_id) VALUES`;
-  const placeholders = [];
-  const values = [];
-
-  players.forEach((player_id) => {
-    placeholders.push('(?, ?)');
-    values.push(player_id, user_id);
-  });
-
-  sqlRP += placeholders.join(', ');
+  const connection = await pool.getConnection();
 
   try {
-    const [result] = await pool.query(sqlRP, values);
-    res.status(200);
-  } catch {
-    res.status(500);
+    // Start a transaction
+    await connection.beginTransaction();
+
+    // Insert the new roster into the `rosters` table
+    const rosterSql = `
+      INSERT INTO rosters (user_id, prompt_id, total_salary, total_penalty)
+      VALUES (?, ?, ?, ?)
+    `;
+    const [rosterResult] = await connection.query(rosterSql, [
+      user_id,
+      prompt_id,
+      total_salary,
+      total_penalty,
+    ]);
+
+    // Get the new roster_id from the insert operation
+    const roster_id = rosterResult.insertId;
+
+    // Prepare the SQL for inserting player_ids into `roster_players`
+    const rosterPlayersSql = `INSERT INTO roster_players (roster_id, player_id) VALUES ?`;
+    const rosterPlayersValues = players.map((player_id) => [roster_id, player_id]);
+
+    // Execute the batch insert for `roster_players`
+    await connection.query(rosterPlayersSql, [rosterPlayersValues]);
+
+    // Commit the transaction
+    await connection.commit();
+
+    res.status(201).send({ message: 'Roster created successfully', roster_id });
+  } catch (error) {
+    // Roll back the transaction in case of an error
+    await connection.rollback();
+    console.error(error);
+    res.status(500).send('An error occurred while creating the roster');
+  } finally {
+    // Release the database connection
+    connection.release();
   }
+});
+
   
-
-  // let sql = `INSERT INTO rosters (roster_id, user_id) VALUES (?, ?)`
-
-  // const result = await pool.query(sql, [])
-})
-  */
   
 // Start the server and listen on a specified port
 const PORT = process.env.PORT || 5000;

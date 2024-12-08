@@ -5,7 +5,7 @@ interface AuthFormProps {
   onClose: () => void; // Function to close the popup
   isRegistering: boolean;
   setIsRegistering: (isRegistering: boolean) => void;
-  onLogin: (username: string) => void;
+  onLogin: (username: string, user_id: string) => void;
 }
 
 const AuthForm: React.FC<AuthFormProps> = ({ onClose, isRegistering, setIsRegistering, onLogin}) => {
@@ -40,11 +40,11 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose, isRegistering, setIsRegist
 
       // Updates username for header
       if(isRegistering) {
-        onLogin(username);
+        onLogin(username, "0");
       } else {
         const loginUsername = data.user.username;
         if(loginUsername) {
-          onLogin(loginUsername);
+          onLogin(loginUsername, data.user.user_id);
           onClose(); // close the AuthForm
         }
       }
