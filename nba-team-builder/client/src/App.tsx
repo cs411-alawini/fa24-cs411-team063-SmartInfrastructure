@@ -40,10 +40,13 @@ const App: React.FC = () => {
 
   // Profile Modal
   const [profileModalOpen, setProfileModalOpen] = useState(false);
+    // helper functions
+    const openProfile = () => setProfileModalOpen(true);
+    const closeProfile = () => setProfileModalOpen(false);
 
-  const openProfile = () => setProfileModalOpen(true);
-  const closeProfile = () => setProfileModalOpen(false);
-
+  // Submit Team states
+  const [isTeamSubmitted, setIsTeamSubmitted] = useState(false);
+  const [penaltyCost, setPenaltyCost] = useState(0);
 
   // Function to fetch players for the search term
   const fetchSearchResults = async (term: string) => {
@@ -163,6 +166,7 @@ const App: React.FC = () => {
   
       const result = await response.json();
       console.log("Validation result:", result);
+      setPenaltyCost(Number(result.total_penalty));
   
       // Update players state with validation results
       setPlayers((prevPlayers) =>
@@ -179,6 +183,10 @@ const App: React.FC = () => {
     } catch (error) {
       console.error("Error validating team:", error);
     }
+    // Set submitbutton as pressed
+    setIsTeamSubmitted(true);
+    
+
   };
 
   // Handle Login Behavior
@@ -224,7 +232,7 @@ return (
       />
       <ErrorMessage message={error} />
       <PlayerSlots players={players} onRemovePlayer={handleRemovePlayer} />
-      <TotalSalary totalSalary={calculateTotalSalary()} />
+      <TotalSalary totalSalary={calculateTotalSalary()} penalty={penaltyCost} isSubmitted={isTeamSubmitted} />
       <button className="submit-button" onClick={handleSubmitTeam}>Submit Team</button>
     </div>
   </>
