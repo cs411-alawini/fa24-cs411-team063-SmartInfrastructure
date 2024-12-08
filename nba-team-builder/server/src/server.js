@@ -318,9 +318,57 @@ app.get('/api/rosters', async (req, res) => {
   }
 });
 
+// Route to get a specific user_id's roster
+app.get('/api/rosters/:user_id', async (req, res) => {
+  const { user_id } = req.params;
+
+  try {
+    // Query to fetch all rosters for a specific user_id
+    const sql = `
+      SELECT r.roster_id, r.user_id, r.prompt_id, rp.player_id, r.total_salary, r.total_penalty
+      FROM rosters r
+      LEFT JOIN roster_players rp ON r.roster_id = rp.roster_id
+      WHERE r.user_id = ?
+    `;
+
+    const [rows] = await pool.query(sql, [user_id]);
+
+    if (rows.length === 0) {
+      return res.status(404).send({ message: `No rosters found for user_id: ${user_id}` });
+    }
+
+    // Organize the data: Group players by roster
+    const rosters = rows.reduce((acc, row) => {
+      const { roster_id, user_id, prompt_id, player_id, total_salary, total_penalty } = row;
+
+      if (!acc[roster_id]) {
+        // Initialize the roster object
+        acc[roster_id] = { 
+          roster_id, 
+          user_id, 
+          prompt_id, 
+          total_salary, 
+          total_penalty, 
+          players: [] 
+        };
+      }
+
+      // Add player_id to the players array
+      if (player_id) {
+        acc[roster_id].players.push(player_id);
+      }
+
+      return acc;
+    }, {});
+
+    res.status(200).json(Object.values(rosters)); // Send as an array
+  } catch (error) {
+    console.error('Error fetching rosters for user:', error);
+    res.status(500).send('An error occurred while fetching rosters');
+  }
+});
 
 // Route to create roster
-
 app.post('/api/rosters', async (req, res) => {
   const { players, prompt_id, user_id, total_salary, total_penalty } = req.body;
   console.log(req.body);
@@ -378,6 +426,39 @@ app.post('/api/rosters', async (req, res) => {
     connection.release();
   }
 });
+
+
+// Route to get a leaderboard for a specific prompt_id
+app.get('/api/leaderboard/:prompt_id', async (req, res) => {
+  const { prompt_id } = req.params;
+
+  try {
+    // Query to fetch the leaderboard data with usernames
+    const sql = `
+      SELECT 
+        r.user_id, 
+        COALESCE(u.username, 'Guest') AS username,
+        (r.total_salary + r.total_penalty) AS score
+      FROM rosters r
+      LEFT JOIN users u ON r.user_id = u.user_id
+      WHERE r.prompt_id = ?
+      ORDER BY score ASC
+    `;
+
+    const [rows] = await pool.query(sql, [prompt_id]);
+
+    if (rows.length === 0) {
+      return res.status(404).send({ message: `No rosters found for prompt_id: ${prompt_id}` });
+    }
+
+    res.status(200).json(rows);
+  } catch (error) {
+    console.error('Error fetching leaderboard:', error);
+    res.status(500).send('An error occurred while fetching the leaderboard');
+  }
+});
+
+
 
   
   

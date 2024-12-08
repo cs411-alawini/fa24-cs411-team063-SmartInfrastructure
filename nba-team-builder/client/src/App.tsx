@@ -14,6 +14,7 @@ import AuthForm from './components/AuthForm';
 import prompts from './data/prompts'
 import { generateDescription } from './utils/generateDescription';
 import Profile from './components/Profile';
+import Leaderboard from './components/Leaderboard';
 
 // Consts
 const ROSTER_SIZE = 5;
@@ -261,6 +262,7 @@ return (
       <PlayerSlots players={players} onRemovePlayer={handleRemovePlayer} />
       <TotalSalary totalSalary={calculateTotalSalary()} penalty={penaltyCost} isSubmitted={isTeamSubmitted} />
       <button className="submit-button" onClick={handleSubmitTeam}>Submit Team</button>
+      <Leaderboard prompt_id={promptIndex}></Leaderboard>
     </div>
   </>
 );
