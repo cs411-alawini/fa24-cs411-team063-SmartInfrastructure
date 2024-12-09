@@ -202,7 +202,7 @@ app.post('/api/validate-team', async (req, res) => {
 });
 
 // Route to create a new account
-// Route to create a new account
+// PROCEDURE
 app.post('/api/register', async (req, res) => {
   const { username, email, password } = req.body;
 
@@ -211,27 +211,29 @@ app.post('/api/register', async (req, res) => {
   }
 
   try {
-    // Check if the email already exists
-    const checkSql = `SELECT * FROM users WHERE email = ?`;
-    const [existingUser] = await pool.query(checkSql, [email]);
+    // Call the stored procedure with the input values
+    const sql = `CALL RegisterUser(?, ?, ?, @user_id, @status_message);`;
+    await pool.query(sql, [username, email, password]);
 
-    if (existingUser.length > 0) {
-      return res.status(400).json({ error: 'Email already in use' });
+    // Fetch the output parameters
+    const [[result]] = await pool.query(
+      `SELECT @user_id AS user_id, @status_message AS status_message`
+    );
+
+    const { user_id, status_message } = result;
+
+    // Check if registration was successful
+    if (!user_id) {
+      return res.status(400).json({ error: status_message });
     }
 
-    // Save the new user
-    const insertSql = `INSERT INTO users (username, email, password) VALUES (?, ?, ?)`;
-    const [insertResult] = await pool.query(insertSql, [username, email, password]);
-
-    // Retrieve the newly created user_id
-    const user_id = insertResult.insertId;
-
-    res.status(201).json({ message: 'User registered successfully', user_id });
+    res.status(201).json({ message: status_message, user_id });
   } catch (err) {
     console.error('Error registering user:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 
 // Route to log in
