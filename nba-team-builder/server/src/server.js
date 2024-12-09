@@ -234,8 +234,6 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
-
-
 // Route to log in
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
@@ -280,6 +278,26 @@ app.get('/api/users', async (req, res) => {
   }
 });
   
+// Route to get total teams of a user
+app.get('/api/users/:user_id/total-teams', async (req, res) => {
+  const { user_id } = req.params;
+
+  try {
+    // SQL query to get the total teams for the given user
+    const sql = `SELECT total_teams FROM users WHERE user_id = ?`;
+    const [[result]] = await pool.query(sql, [user_id]);
+
+    // Check if the user exists
+    if (!result) {
+      return res.status(404).json({ error: `User with ID ${user_id} not found` });
+    }
+
+    res.status(200).json({ user_id, total_teams: result.total_teams });
+  } catch (err) {
+    console.error('Error fetching total teams:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 
 // Route to get all rosters
