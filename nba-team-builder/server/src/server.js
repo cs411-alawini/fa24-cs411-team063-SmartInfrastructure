@@ -374,11 +374,10 @@ app.get('/api/rosters/:user_id', async (req, res) => {
 });
 
 // Route to create roster
+// TRANSACTION ISOLATION LEVEL SERIALIZABLE
 app.post('/api/rosters', async (req, res) => {
   const { players, prompt_id, user_id, total_salary, total_penalty } = req.body;
-  console.log(req.body);
 
-  // Ensure required data is provided and valid
   if (
     prompt_id == null ||
     user_id == null ||
@@ -392,10 +391,11 @@ app.post('/api/rosters', async (req, res) => {
   const connection = await pool.getConnection();
 
   try {
-    // Start a transaction
+    // Set isolation level and begin a transaction
+    await connection.query('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
     await connection.beginTransaction();
 
-    // Insert the new roster into the `rosters` table
+    // Insert the new roster
     const rosterSql = `
       INSERT INTO rosters (user_id, prompt_id, total_salary, total_penalty)
       VALUES (?, ?, ?, ?)
@@ -407,14 +407,12 @@ app.post('/api/rosters', async (req, res) => {
       total_penalty,
     ]);
 
-    // Get the new roster_id from the insert operation
     const roster_id = rosterResult.insertId;
 
-    // Prepare the SQL for inserting player_ids into `roster_players`
+    // Insert players into roster_players
     const rosterPlayersSql = `INSERT INTO roster_players (roster_id, player_id) VALUES ?`;
     const rosterPlayersValues = players.map((player_id) => [roster_id, player_id]);
 
-    // Execute the batch insert for `roster_players`
     await connection.query(rosterPlayersSql, [rosterPlayersValues]);
 
     // Commit the transaction
@@ -422,12 +420,10 @@ app.post('/api/rosters', async (req, res) => {
 
     res.status(201).send({ message: 'Roster created successfully', roster_id });
   } catch (error) {
-    // Roll back the transaction in case of an error
     await connection.rollback();
     console.error(error);
     res.status(500).send('An error occurred while creating the roster');
   } finally {
-    // Release the database connection
     connection.release();
   }
 });
