@@ -4,9 +4,16 @@ import './styles/Profile.css';
 interface ProfileProps {
   onClose: () => void;
   username: string;
+  user_id: number;
+  onUserUpdate: () => void;
 }
 
-const Profile: React.FC<ProfileProps> = ({ onClose, username }) => {
+const Profile: React.FC<ProfileProps> = ({
+  onClose,
+  username,
+  user_id,
+  onUserUpdate,
+}) => {
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
       onClose(); // Close modal if the overlay is clicked

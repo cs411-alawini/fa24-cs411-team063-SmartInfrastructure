@@ -5,6 +5,14 @@
     },
     "dependencies": {
         "cors": "^2.8.5",
-        "mysql2": "^3.11.4"
-    }
+        "dotenv": "^16.4.7",
+        "express": "^4.21.2",
+        "mysql2": "^3.11.5"
+    },
+    "name": "nba-team-builder",
+    "version": "1.0.0",
+    "description": "In the project directory, you can run:",
+    "main": "index.js",
+    "author": "",
+    "license": "ISC"
 }

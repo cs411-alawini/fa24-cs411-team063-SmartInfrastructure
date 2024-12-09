@@ -39,17 +39,21 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose, isRegistering, setIsRegist
       setMessage(data.message);
 
       // Updates username for header
-      if(isRegistering) {
-        onLogin(username, "0");
+      if (isRegistering) {
+        // After registration, automatically log in the user
+        // Optionally, you can redirect them to the login form
+        onLogin(username, data.user_id); // Use the returned user_id
+        onClose(); // Close the AuthForm after registration
       } else {
+        // After login, use the returned user data
         const loginUsername = data.user.username;
-        if(loginUsername) {
-          onLogin(loginUsername, data.user.user_id);
-          onClose(); // close the AuthForm
+        const loginUserId = data.user.user_id;
+        if (loginUsername && loginUserId) {
+          onLogin(loginUsername, loginUserId);
+          onClose(); // Close the AuthForm after login
         }
       }
-
-    } catch (err) {
+    } catch (err: any) {
       const error = err as Error;
       setMessage(error.message || 'Something went wrong');
     }

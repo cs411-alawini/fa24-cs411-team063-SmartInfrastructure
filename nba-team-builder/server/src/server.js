@@ -202,6 +202,7 @@ app.post('/api/validate-team', async (req, res) => {
 });
 
 // Route to create a new account
+// Route to create a new account
 app.post('/api/register', async (req, res) => {
   const { username, email, password } = req.body;
 
@@ -220,14 +221,18 @@ app.post('/api/register', async (req, res) => {
 
     // Save the new user
     const insertSql = `INSERT INTO users (username, email, password) VALUES (?, ?, ?)`;
-    await pool.query(insertSql, [username, email, password]);
+    const [insertResult] = await pool.query(insertSql, [username, email, password]);
 
-    res.status(201).json({ message: 'User registered successfully' });
+    // Retrieve the newly created user_id
+    const user_id = insertResult.insertId;
+
+    res.status(201).json({ message: 'User registered successfully', user_id });
   } catch (err) {
     console.error('Error registering user:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 // Route to log in
 app.post('/api/login', async (req, res) => {
@@ -426,6 +431,91 @@ app.post('/api/rosters', async (req, res) => {
     connection.release();
   }
 });
+
+app.get('/api/explore-rosters', async (req, res) => {
+  try {
+    const page = parseInt(req.query.page, 50) || 1;
+    const limit = parseInt(req.query.limit, 50) || 50;
+    const offset = (page - 1) * limit;
+
+    // SQL Query with LIMIT and OFFSET
+    const sql = `
+      SELECT 
+        r.roster_id, 
+        r.user_id, 
+        u.username, 
+        r.prompt_id, 
+        r.total_salary, 
+        r.total_penalty,
+        p.player_id,
+        p.first_name,
+        p.last_name,
+        p.team_id,
+        t.team_name,
+        p.salary
+      FROM rosters r
+      LEFT JOIN users u ON r.user_id = u.user_id
+      LEFT JOIN roster_players rp ON r.roster_id = rp.roster_id
+      LEFT JOIN players p ON rp.player_id = p.player_id
+      LEFT JOIN teams t ON p.team_id = t.team_id
+      ORDER BY r.roster_id DESC
+      LIMIT ? OFFSET ?
+    `;
+
+    const [rows] = await pool.query(sql, [limit, offset]);
+    console.log(`Fetched ${rows.length} rows from DB for page ${page}`);
+
+    console.log(rows)
+    // Organize Data
+    const rosters = rows.reduce((acc, row) => {
+      const { roster_id, user_id, prompt_id, player_id, total_salary, total_penalty } = row;
+
+      if (!acc[roster_id]) {
+        acc[roster_id] = { 
+          roster_id, 
+          user_id, 
+          username: row.username || 'Guest', 
+          prompt_id, 
+          total_salary: row.total_salary || 0, 
+          total_penalty: row.total_penalty || 0, 
+          players: [] 
+        };
+      }
+
+      if (player_id) {
+        acc[roster_id].players.push({
+          player_id,
+          first_name: row.first_name,
+          last_name: row.last_name,
+          team_id: row.team_id,
+          team_name: row.team_name,
+          salary: row.salary || 0
+        });
+      }
+
+      return acc;
+    }, {});
+
+    console.log(`Processed ${Object.keys(rosters).length} rosters`);
+
+    // Get Total Rosters Count
+    const countSql = `SELECT COUNT(DISTINCT roster_id) as total FROM rosters`;
+    const [countRows] = await pool.query(countSql);
+    const total = countRows[0].total;
+    const totalPages = Math.ceil(total / limit);
+
+    res.status(200).json({
+      rosters: Object.values(rosters),
+      currentPage: page,
+      totalPages,
+      totalRosters: total
+    });
+  } catch (error) {
+    console.error('Error fetching explore rosters:', error);
+    res.status(500).send({ error: 'An error occurred while fetching explore rosters' });
+  }
+});
+
 
 
 // Route to get a leaderboard for a specific prompt_id

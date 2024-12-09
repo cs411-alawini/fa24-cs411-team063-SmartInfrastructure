@@ -43,3 +43,48 @@
     display: flex;
     
   }
+
+  .header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #003366; /* NBA Dark Blue */
+    color: white;
+    padding: 10px 20px;
+  }
+  
+  .header-bar h1 {
+    margin: 0;
+  }
+  
+  .header-buttons {
+    display: flex;
+    gap: 15px;
+  }
+  
+  .header-text {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .header-text:hover {
+    text-decoration: underline;
+  }
+  
+  .header-link {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    padding: 6px 12px;
+    border: 1px solid white;
+    border-radius: 4px;
+  }
+  
+  .header-link:hover {
+    background-color: white;
+    color: #003366;
+  }
+  
