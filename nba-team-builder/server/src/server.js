@@ -200,7 +200,7 @@ app.post('/api/validate-team', async (req, res) => {
 });
 
 // Route to create a new account
-// Route to create a new account
+// PROCEDURE
 app.post('/api/register', async (req, res) => {
   const { username, email, password } = req.body;
 
@@ -209,28 +209,28 @@ app.post('/api/register', async (req, res) => {
   }
 
   try {
-    // Check if the email already exists
-    const checkSql = `SELECT * FROM users WHERE email = ?`;
-    const [existingUser] = await pool.query(checkSql, [email]);
+    // Call the stored procedure with the input values
+    const sql = `CALL RegisterUser(?, ?, ?, @user_id, @status_message);`;
+    await pool.query(sql, [username, email, password]);
 
-    if (existingUser.length > 0) {
-      return res.status(400).json({ error: 'Email already in use' });
+    // Fetch the output parameters
+    const [[result]] = await pool.query(
+      `SELECT @user_id AS user_id, @status_message AS status_message`
+    );
+
+    const { user_id, status_message } = result;
+
+    // Check if registration was successful
+    if (!user_id) {
+      return res.status(400).json({ error: status_message });
     }
 
-    // Save the new user
-    const insertSql = `INSERT INTO users (username, email, password) VALUES (?, ?, ?)`;
-    const [insertResult] = await pool.query(insertSql, [username, email, password]);
-
-    // Retrieve the newly created user_id
-    const user_id = insertResult.insertId;
-
-    res.status(201).json({ message: 'User registered successfully', user_id });
+    res.status(201).json({ message: status_message, user_id });
   } catch (err) {
     console.error('Error registering user:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
 
 // Route to log in
 app.post('/api/login', async (req, res) => {
@@ -276,6 +276,26 @@ app.get('/api/users', async (req, res) => {
   }
 });
   
+// Route to get total teams of a user
+app.get('/api/users/:user_id/total-teams', async (req, res) => {
+  const { user_id } = req.params;
+
+  try {
+    // SQL query to get the total teams for the given user
+    const sql = `SELECT total_teams FROM users WHERE user_id = ?`;
+    const [[result]] = await pool.query(sql, [user_id]);
+
+    // Check if the user exists
+    if (!result) {
+      return res.status(404).json({ error: `User with ID ${user_id} not found` });
+    }
+
+    res.status(200).json({ user_id, total_teams: result.total_teams });
+  } catch (err) {
+    console.error('Error fetching total teams:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 
 // Route to get all rosters
@@ -372,10 +392,10 @@ app.get('/api/rosters/:user_id', async (req, res) => {
 });
 
 // Route to create roster
+// TRANSACTION ISOLATION LEVEL SERIALIZABLE
 app.post('/api/rosters', async (req, res) => {
   const { players, prompt_id, total_salary, total_penalty, user_id } = req.body;
 
-  // Ensure required data is provided and valid
   if (
     prompt_id == null ||
     total_salary == null ||
@@ -388,10 +408,11 @@ app.post('/api/rosters', async (req, res) => {
   const connection = await pool.getConnection();
 
   try {
-    // Start a transaction
+    // Set isolation level and begin a transaction
+    await connection.query('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
     await connection.beginTransaction();
 
-    // Insert the new roster into the `rosters` table
+    // Insert the new roster
     const rosterSql = `
       INSERT INTO rosters (user_id, prompt_id, total_salary, total_penalty)
       VALUES (?, ?, ?, ?)
@@ -403,14 +424,12 @@ app.post('/api/rosters', async (req, res) => {
       total_penalty,
     ]);
 
-    // Get the new roster_id from the insert operation
     const roster_id = rosterResult.insertId;
 
-    // Prepare the SQL for inserting player_ids into `roster_players`
+    // Insert players into roster_players
     const rosterPlayersSql = `INSERT INTO roster_players (roster_id, player_id) VALUES ?`;
     const rosterPlayersValues = players.map((player_id) => [roster_id, player_id]);
 
-    // Execute the batch insert for `roster_players`
     await connection.query(rosterPlayersSql, [rosterPlayersValues]);
 
     // Commit the transaction
@@ -418,12 +437,10 @@ app.post('/api/rosters', async (req, res) => {
 
     res.status(201).send({ message: 'Roster created successfully', roster_id });
   } catch (error) {
-    // Roll back the transaction in case of an error
     await connection.rollback();
     console.error(error);
     res.status(500).send({ error: 'An error occurred while creating the roster' });
   } finally {
-    // Release the database connection
     connection.release();
   }
 });

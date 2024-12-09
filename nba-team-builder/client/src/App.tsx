@@ -293,7 +293,7 @@ const App: React.FC = () => {
           path="/"
           element={
             <div className="app-container">
-              <h1>Create the cheapest team following these rules</h1>
+              <h1 className="instructions">Create the cheapest team following these rules</h1>
               <PromptBox description={generateDescription(selectedPrompt)} onClick={cyclePrompt} />
               <SearchBar
                 searchTerm={searchTerm}
