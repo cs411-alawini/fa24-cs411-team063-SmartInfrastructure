@@ -1,19 +1,23 @@
 // src/components/ExploreRosters.tsx
+
 import React, { useEffect, useState } from 'react';
 import './styles/ExploreRosters.css';
-import { Roster, RosterResponse } from '../types/Roster'; // Import shared types
+import { Roster, RosterResponse } from '../types/Roster';
+import EditRoster from './EditRoster'; // Import the EditRoster component
 
 interface ExploreRostersProps {
   onSelectRoster: (roster: Roster) => void;
   onDeleteRoster: (roster_id: number) => void;
+  user_id: number | null; // Add user_id as a prop
 }
 
-const ExploreRosters: React.FC<ExploreRostersProps> = ({ onSelectRoster, onDeleteRoster }) => {
+const ExploreRosters: React.FC<ExploreRostersProps> = ({ onSelectRoster, onDeleteRoster, user_id }) => {
   const [rosters, setRosters] = useState<Roster[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
+  const [editingRoster, setEditingRoster] = useState<Roster | null>(null); // State to handle editing
   const limit = 10;
 
   useEffect(() => {
@@ -21,7 +25,11 @@ const ExploreRosters: React.FC<ExploreRostersProps> = ({ onSelectRoster, onDelet
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch(`http://localhost:5000/api/explore-rosters?page=${currentPage}&limit=${limit}`);
+        const response = await fetch(`http://localhost:5000/api/explore-rosters?page=${currentPage}&limit=${limit}`, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
         if (!response.ok) {
           const errorData = await response.json();
           setError(errorData.error || 'Failed to fetch rosters');
@@ -44,10 +52,19 @@ const ExploreRosters: React.FC<ExploreRostersProps> = ({ onSelectRoster, onDelet
   const handleNextPage = () => setCurrentPage(prev => Math.min(prev + 1, totalPages));
 
   const handleDelete = async (roster_id: number) => {
+    if (!user_id) {
+      setError('You must be logged in to delete a roster.');
+      return;
+    }
+
     if (window.confirm('Are you sure you want to delete this roster?')) {
       try {
         const response = await fetch(`http://localhost:5000/api/rosters/${roster_id}`, {
           method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ user_id }), // Now user_id is defined
         });
 
         const data = await response.json();
@@ -64,6 +81,11 @@ const ExploreRosters: React.FC<ExploreRostersProps> = ({ onSelectRoster, onDelet
         setError('An unexpected error occurred while deleting the roster.');
       }
     }
+  };
+
+  const handleUpdate = () => {
+    // Refresh rosters after an update
+    setCurrentPage(1); // Optionally reset to first page
   };
 
   return (
@@ -91,6 +113,7 @@ const ExploreRosters: React.FC<ExploreRostersProps> = ({ onSelectRoster, onDelet
                 </ul>
                 <div className="roster-actions">
                   <button onClick={() => onSelectRoster(roster)}>Use This Roster</button>
+                  <button onClick={() => setEditingRoster(roster)}>Edit Roster</button>
                   <button className="delete-button" onClick={() => handleDelete(roster.roster_id)}>Delete Roster</button>
                 </div>
               </div>
@@ -110,6 +133,16 @@ const ExploreRosters: React.FC<ExploreRostersProps> = ({ onSelectRoster, onDelet
       )}
       {!loading && !error && rosters.length === 0 && (
         <p>No rosters available to display.</p>
+      )}
+
+      {/* Edit Roster Modal */}
+      {editingRoster && (
+        <EditRoster
+          roster={editingRoster}
+          onUpdate={handleUpdate}
+          onClose={() => setEditingRoster(null)}
+          user_id={user_id} // Pass user_id to EditRoster
+        />
       )}
     </div>
   );

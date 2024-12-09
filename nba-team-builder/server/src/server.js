@@ -6,7 +6,7 @@ const app = express();
 require('dotenv').config();
 
 // middleware to allow req to have nice and neat attributes
-app.use(express.json())
+app.use(express.json());
 
 
 const cors = require('cors');
@@ -28,16 +28,11 @@ const pool = mysql.createPool({
 });
 
 // Player Search Bar Endpoint
+// Player Search Bar Endpoint
 app.get('/api/players', async (req, res) => {
   const { first_name } = req.query;
 
-  if (!first_name) {
-    return res.status(400).json({ error: 'Search term is required' });
-  }
-
   try {
-    // Split search term by spaces
-    const terms = first_name.split(' ');
     let sql = `
       SELECT 
         players.*,
@@ -52,14 +47,19 @@ app.get('/api/players', async (req, res) => {
     `;
     const params = [];
 
-    if (terms.length === 1) {
-      // Single term: match either first or last name, or the combined first and last name
-      sql += ' AND (players.first_name LIKE ? OR players.last_name LIKE ? OR players.first_and_last_name LIKE ?)';
-      params.push(`%${terms[0]}%`, `%${terms[0]}%`, `%${terms[0]}%`);
-    } else if (terms.length >= 2) {
-      // Two terms: match the exact first_and_last_name or separately match first and last name
-      sql += ' AND (players.first_and_last_name LIKE ? OR (players.first_name LIKE ? AND players.last_name LIKE ?))';
-      params.push(`%${terms.join(' ')}%`, `%${terms[0]}%`, `%${terms[1]}%`);
+    if (first_name) {
+      // Split search term by spaces
+      const terms = first_name.split(' ');
+
+      if (terms.length === 1) {
+        // Single term: match either first or last name, or the combined first and last name
+        sql += ' AND (players.first_name LIKE ? OR players.last_name LIKE ? OR players.first_and_last_name LIKE ?)';
+        params.push(`%${terms[0]}%`, `%${terms[0]}%`, `%${terms[0]}%`);
+      } else if (terms.length >= 2) {
+        // Two terms: match the exact first_and_last_name or separately match first and last name
+        sql += ' AND (players.first_and_last_name LIKE ? OR (players.first_name LIKE ? AND players.last_name LIKE ?))';
+        params.push(`%${terms.join(' ')}%`, `%${terms[0]}%`, `%${terms[1]}%`);
+      }
     }
 
     // Additional filter to not display accidental uploaded data
@@ -76,8 +76,6 @@ app.get('/api/players', async (req, res) => {
     res.status(500).json({ error: 'An error occurred while fetching players.' });
   }
 });
-
-
 
 
 // Team Validation Post Endpoint
@@ -375,18 +373,16 @@ app.get('/api/rosters/:user_id', async (req, res) => {
 
 // Route to create roster
 app.post('/api/rosters', async (req, res) => {
-  const { players, prompt_id, user_id, total_salary, total_penalty } = req.body;
-  console.log(req.body);
+  const { players, prompt_id, total_salary, total_penalty, user_id } = req.body;
 
   // Ensure required data is provided and valid
   if (
     prompt_id == null ||
-    user_id == null ||
     total_salary == null ||
     total_penalty == null ||
     !Array.isArray(players)
   ) {
-    return res.status(400).send('Invalid input data');
+    return res.status(400).send({ error: 'Invalid input data' });
   }
 
   const connection = await pool.getConnection();
@@ -425,7 +421,7 @@ app.post('/api/rosters', async (req, res) => {
     // Roll back the transaction in case of an error
     await connection.rollback();
     console.error(error);
-    res.status(500).send('An error occurred while creating the roster');
+    res.status(500).send({ error: 'An error occurred while creating the roster' });
   } finally {
     // Release the database connection
     connection.release();
@@ -513,6 +509,118 @@ app.get('/api/explore-rosters', async (req, res) => {
   } catch (error) {
     console.error('Error fetching explore rosters:', error);
     res.status(500).send({ error: 'An error occurred while fetching explore rosters' });
+  }
+});
+
+// Route to update a roster
+app.put('/api/rosters/:roster_id', async (req, res) => {
+  const { roster_id } = req.params;
+  const { players, prompt_id, total_salary, total_penalty, user_id } = req.body;
+
+  // Validate input data
+  if (
+    prompt_id == null ||
+    total_salary == null ||
+    total_penalty == null ||
+    !Array.isArray(players) ||
+    user_id == null
+  ) {
+    return res.status(400).send({ error: 'Invalid input data' });
+  }
+
+  const connection = await pool.getConnection();
+
+  try {
+    // Start a transaction
+    await connection.beginTransaction();
+
+    // Check if roster exists and belongs to the user
+    const [rosterRows] = await connection.query('SELECT * FROM rosters WHERE roster_id = ?', [roster_id]);
+    if (rosterRows.length === 0) {
+      await connection.rollback();
+      return res.status(404).send({ error: 'Roster not found' });
+    }
+
+    const roster = rosterRows[0];
+    if (roster.user_id !== user_id) {
+      await connection.rollback();
+      return res.status(403).send({ error: 'Unauthorized to update this roster' });
+    }
+
+    // Update the roster details
+    const updateRosterSql = `
+      UPDATE rosters
+      SET prompt_id = ?, total_salary = ?, total_penalty = ?
+      WHERE roster_id = ?
+    `;
+    await connection.query(updateRosterSql, [prompt_id, total_salary, total_penalty, roster_id]);
+
+    // Delete existing players from roster_players
+    await connection.query('DELETE FROM roster_players WHERE roster_id = ?', [roster_id]);
+
+    // Insert updated players into roster_players
+    const rosterPlayersSql = `INSERT INTO roster_players (roster_id, player_id) VALUES ?`;
+    const rosterPlayersValues = players.map((player_id) => [roster_id, player_id]);
+    await connection.query(rosterPlayersSql, [rosterPlayersValues]);
+
+    // Commit the transaction
+    await connection.commit();
+
+    res.status(200).send({ message: 'Roster updated successfully' });
+  } catch (error) {
+    await connection.rollback();
+    console.error('Error updating roster:', error);
+    res.status(500).send({ error: 'An error occurred while updating the roster' });
+  } finally {
+    connection.release();
+  }
+});
+
+
+// Route to delete a roster
+app.delete('/api/rosters/:roster_id', async (req, res) => {
+  const { roster_id } = req.params;
+  const { user_id } = req.body;
+
+  if (!user_id) {
+    return res.status(400).send({ error: 'user_id is required to delete a roster' });
+  }
+
+  const connection = await pool.getConnection();
+
+  try {
+    // Start a transaction
+    await connection.beginTransaction();
+
+    // Check if roster exists and belongs to the user
+    const [rosterRows] = await connection.query('SELECT * FROM rosters WHERE roster_id = ?', [roster_id]);
+    if (rosterRows.length === 0) {
+      await connection.rollback();
+      return res.status(404).send({ error: 'Roster not found' });
+    }
+
+    const roster = rosterRows[0];
+    if (roster.user_id !== user_id) {
+      await connection.rollback();
+      return res.status(403).send({ error: 'Unauthorized to delete this roster' });
+    }
+
+    // Delete from roster_players
+    await connection.query('DELETE FROM roster_players WHERE roster_id = ?', [roster_id]);
+
+    // Delete from rosters
+    await connection.query('DELETE FROM rosters WHERE roster_id = ?', [roster_id]);
+
+    // Commit the transaction
+    await connection.commit();
+
+    res.status(200).send({ message: 'Roster deleted successfully' });
+  } catch (error) {
+    await connection.rollback();
+    console.error('Error deleting roster:', error);
+    res.status(500).send({ error: 'An error occurred while deleting the roster' });
+  } finally {
+    connection.release();
   }
 });
 

@@ -7,6 +7,7 @@ interface SearchBarProps {
   searchResults: any[];
   onPlayerSelect: (player: any) => void;
   clearSearch: () => void;
+  placeholder?: string; // Add this line
 }
 
 // Fetches URL for team's logo based on teamId
@@ -19,6 +20,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   searchResults,
   onPlayerSelect,
   clearSearch,
+  placeholder = "Search players...",
 }) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -40,7 +42,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
     <div className="search-container" ref={dropdownRef}>
       <input
         type="text"
-        placeholder="Search for a player..."
+        placeholder={placeholder}
         value={searchTerm}
         onChange={(e) => onSearchChange(e.target.value)}
         className="search-bar"

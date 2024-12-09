@@ -30,7 +30,7 @@ let promptIndex = 0;
 
 const App: React.FC = () => {
   const navigate = useNavigate();
-  
+
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [selectedPrompt, setSelectedPrompt] = useState(prompts[promptIndex]); // Set prompt based on prompts.ts
@@ -319,6 +319,7 @@ const App: React.FC = () => {
             <ExploreRosters
                 onSelectRoster={handleSelectRoster}
                 onDeleteRoster={handleDeleteRoster}
+                user_id={user_id}
               />
           }
         />
